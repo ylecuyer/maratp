@@ -23,7 +23,7 @@ function setErrorFetchingTraffic() {
 }
 
 function getTrafficCondition() {
-    $.get('https://api-ratp.pierre-grimaud.fr/v3/traffic/rers/b').done(parseTrafficResult)
+    $.get('https://api-ratp.pierre-grimaud.fr/v3/traffic/rers/b?t='+Date.now()).done(parseTrafficResult)
       .fail(setErrorFetchingTraffic)
 }
 
@@ -55,7 +55,7 @@ function logoUrl(line) {
 
 function fetchTimes(ctx, busInfo) {
     setLoading(ctx)
-    $.get('https://api-ratp.pierre-grimaud.fr/v3/schedules/'+busInfo.type+'/'+busInfo.code+'/'+busInfo.station+'/'+busInfo.way+'?_format=json').done(function(data) {
+    $.get('https://api-ratp.pierre-grimaud.fr/v3/schedules/'+busInfo.type+'/'+busInfo.code+'/'+busInfo.station+'/'+busInfo.way+'?_format=json&t='+Date.now()).done(function(data) {
         parseTimeResult(ctx, data)
     }).fail(function() {
         setErrorFetchingTimes(ctx, data)
