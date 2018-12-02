@@ -1,3 +1,22 @@
+function zeroPad(timeUnit) {
+    if (timeUnit < 10) {
+        return '0' + timeUnit
+    }
+    else {
+        return timeUnit
+    }
+}
+
+function setLastUpdated() {
+    var now = new Date()
+
+    hours = zeroPad(now.getHours())
+    minutes = zeroPad(now.getMinutes())
+    seconds = zeroPad(now.getSeconds())
+
+    $('#last_updated').html(hours + ':' + minutes + ':' + seconds)
+}
+
 function setGoodTraffic(message) {
     $('#traffic').html(message)
 }
@@ -28,6 +47,7 @@ function getTrafficCondition() {
 }
 
 $(function() {
+    setLastUpdated()
     getTrafficCondition()
     setTimes()
 })
