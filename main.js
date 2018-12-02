@@ -38,25 +38,34 @@ function parseTrafficResult(data) {
 }
 
 function setErrorFetchingTraffic() {
-    console.log('ERROR')
+    $('.loader', document.body).remove()
+    setError('#traffic', document.body)
 }
 
 function getTrafficCondition() {
+    setLoading('#traffic', document.body)
     $.get('https://api-ratp.pierre-grimaud.fr/v3/traffic/rers/b?t='+Date.now()).done(parseTrafficResult)
       .fail(setErrorFetchingTraffic)
 }
 
-$(function() {
+function update() {
     setLastUpdated()
     getTrafficCondition()
-    setTimes()
+    setTimes() 
+}
+
+$(function() {
+    update()
+    $('#update_now').on('click', update)
 })
 
 function setTimes() {
     $('#t tr').each(function(idx, elt) {
-        setupRow(elt)
-        $('.img', elt).html("197")
-        setLogo(elt, $(elt).data().code)
+        if ($(elt).children().length == 0) {
+            setupRow(elt)
+            $('.img', elt).html("197")
+            setLogo(elt, $(elt).data().code)            
+        }
         fetchTimes(elt, $(elt).data())
     })
 }
@@ -74,7 +83,7 @@ function logoUrl(line) {
 }
 
 function fetchTimes(ctx, busInfo) {
-    setLoading(ctx)
+    setLoading('.img', ctx)
     $.get('https://api-ratp.pierre-grimaud.fr/v3/schedules/'+busInfo.type+'/'+busInfo.code+'/'+busInfo.station+'/'+busInfo.way+'?_format=json&t='+Date.now()).done(function(data) {
         parseTimeResult(ctx, data)
     }).fail(function() {
@@ -82,22 +91,27 @@ function fetchTimes(ctx, busInfo) {
     })
 }
 
-function setLoading(ctx) {
-    $('.t1', ctx).html('loading')
-    $('.t2', ctx).html('loading')
+function setLoading(klass, ctx) {
+    $(klass, ctx).append('<img class="loader" src="loader.gif" />')
+}
+
+function setError(klass, ctx) {
+    $(klass, ctx).append('<img class="error" src="red.png" />')
 }
 
 function parseTimeResult(ctx, data) {
     var t1 = _try(function() { return data.result.schedules[0].message }, "error") 
     var t2 = _try(function() { return data.result.schedules[1].message }, "error") 
 
+    $('.loader', ctx).remove()
+    $('.error', ctx).remove()
     $('.t1', ctx).html(t1)
     $('.t2', ctx).html(t2)
 }
 
 function setErrorFetchingTimes(ctx, data) {
-    $('.t1', ctx).html('error')
-    $('.t2', ctx).html('error')
+    $('.loader', ctx).remove()
+    setError('.img', ctx)
 }
 
 function _try(func, fallbackValue) {
